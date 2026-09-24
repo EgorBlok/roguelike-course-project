@@ -1,0 +1,38 @@
+
+# --- C++ ---
+*.exe
+*.out
+*.o
+*.obj
+*.a
+*.lib
+*.dll
+*.so
+*.dylib
+
+build/
+cmake-build-*/
+Debug/
+Release/
+x64/
+x86/
+
+# --- Visual Studio / VS Code ---
+.vs/
+.vscode/
+*.pdb
+*.ilk
+*.idb
+
+# --- C# ---
+bin/
+obj/
+
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# --- OS ---
+.DS_Store
+Thumbs.db
