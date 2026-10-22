@@ -1,37 +1,44 @@
 
-#include "Inventory.hpp"
+#include "Enemy.hpp"
 
-#include <iostream>
 #include <windows.h>
-#include <clocale>
+#include <iostream>
 
 int main()
 {
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
 
-    Inventory inventory;
+    std::cout << "=== Проверка класса Enemy ===\n";
 
-    // Добавляем пять предметов
-    inventory.AddItem("Зелье здоровья");
-    inventory.AddItem("Зелье силы");
-    inventory.AddItem("Зелье здоровья");
-    inventory.AddItem("Зелье защиты");
-    inventory.AddItem("Зелье силы");
+    Enemy enemy("Скелет", 50, 10);
 
-    // Проверяем ограничение вместимости
-    inventory.AddItem("Шестой предмет");
+    enemy.ShowInfo();
 
-    inventory.ShowInfo();
+    std::cout << "\n--- Проверка получения урона ---\n";
 
-    // Удаляем один предмет
-    inventory.RemoveItem("Зелье силы");
+    enemy.TakeDamage(20);
+    enemy.TakeDamage(-10);
 
-    // Экипируем и заменяем талисман
-    inventory.EquipTalisman("Берсерк");
-    inventory.EquipTalisman("Лекарь");
+    enemy.ShowInfo();
 
-    inventory.ShowInfo();
+    std::cout << "\n--- Проверка атаки ---\n";
+
+    int damage = enemy.Attack();
+    std::cout << "Полученный урон от атаки: "
+              << damage << '\n';
+
+    std::cout << "\n--- Проверка смерти ---\n";
+
+    enemy.TakeDamage(100);
+
+    enemy.ShowInfo();
+
+    // Побеждённый противник не может атаковать
+    enemy.Attack();
+
+    // Нельзя повторно наносить урон побеждённому
+    enemy.TakeDamage(10);
 
     return 0;
 }
