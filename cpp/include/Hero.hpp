@@ -4,6 +4,7 @@
 #include "Inventory.hpp"
 #include "Enemy.hpp"
 
+#include <memory>
 #include <string>
 #include <string_view>
 
@@ -18,7 +19,7 @@ private:
     int m_coins{ 0 };
 
     Inventory m_inventory{};
-    Enemy* m_enemy{ nullptr };
+    std::weak_ptr<Enemy> m_enemy{};
 
 public:
     Hero(std::string_view name, int maxHealth, int attack);
@@ -31,7 +32,7 @@ public:
     void Heal(int amount);
     void AttackEnemy();
 
-    void SetEnemy(Enemy* enemy);
+    void SetEnemy(const std::shared_ptr<Enemy>& enemy);
     void AddCoins(int amount);
 
     void ShowInfo() const;
