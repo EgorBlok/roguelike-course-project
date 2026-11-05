@@ -77,32 +77,34 @@ void Hero::AttackEnemy()
         return;
     }
 
-    if (m_enemy == nullptr)
+    // weak_ptr не владеет противником: lock() проверяет, жив ли объект.
+    const std::shared_ptr<Enemy> enemy = m_enemy.lock();
+    if (!enemy)
     {
-        std::cout << "Нет текущего противника\n";
+        std::cout << "Нет текущего противника (или он уничтожен)\n";
         return;
     }
 
-    if (!m_enemy->IsAlive())
+    if (!enemy->IsAlive())
     {
         std::cout << "Противник уже побеждён\n";
         return;
     }
 
     std::cout << m_name << " атакует "
-              << m_enemy->GetName() << '\n';
+              << enemy->GetName() << '\n';
 
-    m_enemy->TakeDamage(m_attack);
+    enemy->TakeDamage(m_attack);
 }
 
-void Hero::SetEnemy(Enemy* enemy)
+void Hero::SetEnemy(const std::shared_ptr<Enemy>& enemy)
 {
     m_enemy = enemy;
 
-    if (m_enemy != nullptr)
+    if (enemy)
     {
         std::cout << "Текущий противник: "
-                  << m_enemy->GetName() << '\n';
+                  << enemy->GetName() << '\n';
     }
     else
     {
