@@ -6,31 +6,47 @@ Hero::Hero(std::string_view name, int maxHealth, int attack)
     : BaseCharacter{ name.empty() ? std::string_view{ "Безымянный герой" } : name,
                      maxHealth, attack }
 {
-    std::cout << "[Hero] Герой создан: " << GetName() << '\n';
+    std::cout << "[Hero] Конструктор: " << GetName() << '\n';
+}
+
+Hero::Hero(const Hero& other)
+    : BaseCharacter{ other }
+    , m_coins{ other.m_coins }
+    , m_inventory{ other.m_inventory }
+    , m_enemy{ other.m_enemy }
+{
+    std::cout << "[Hero] Копирование: " << GetName() << '\n';
 }
 
 Hero::~Hero()
 {
-    std::cout << "[Hero] Герой уничтожается: " << GetName() << '\n';
+    std::cout << "[Hero] Деструктор: " << GetName() << '\n';
+}
+
+Hero& Hero::operator=(const Hero& other)
+{
+    if (this == &other)
+    {
+        return *this;
+    }
+
+    BaseCharacter::operator=(other);
+    m_coins = other.m_coins;
+    m_inventory = other.m_inventory;
+    m_enemy = other.m_enemy;
+    return *this;
 }
 
 void Hero::Heal(int amount)
 {
-    if (!IsAlive())
-    {
-        std::cout << "Нельзя лечить погибшего героя\n";
-        return;
-    }
-
-    if (amount <= 0 || GetHealth() == GetMaxHealth())
+    if (!IsAlive() || amount <= 0 || GetHealth() == GetMaxHealth())
     {
         std::cout << "Лечение невозможно\n";
         return;
     }
 
     RestoreHealth(amount);
-    std::cout << GetName() << " восстанавливает здоровье: "
-              << GetHealth() << "/" << GetMaxHealth() << '\n';
+    std::cout << GetName() << " восстанавливает HP: " << GetHealth() << '\n';
 }
 
 void Hero::AttackEnemy()
@@ -41,17 +57,10 @@ void Hero::AttackEnemy()
         return;
     }
 
-    // Слабая ссылка не владеет противником.
     const std::shared_ptr<Enemy> enemy = m_enemy.lock();
-    if (!enemy)
+    if (!enemy || !enemy->IsAlive())
     {
-        std::cout << "Нет текущего противника (или он уничтожен)\n";
-        return;
-    }
-
-    if (!enemy->IsAlive())
-    {
-        std::cout << "Противник уже побеждён\n";
+        std::cout << "Нет живого противника\n";
         return;
     }
 
@@ -62,41 +71,14 @@ void Hero::AttackEnemy()
 void Hero::SetEnemy(const std::shared_ptr<Enemy>& enemy)
 {
     m_enemy = enemy;
-
-    if (enemy)
-    {
-        std::cout << "Текущий противник: " << enemy->GetName() << '\n';
-    }
-    else
-    {
-        std::cout << "Текущий противник отсутствует\n";
-    }
 }
 
 void Hero::AddCoins(int amount)
 {
-    if (amount <= 0)
+    if (amount > 0)
     {
-        std::cout << "Некорректное количество монет\n";
-        return;
+        m_coins += amount;
     }
-
-    m_coins += amount;
-    std::cout << "Получено монет: " << amount
-              << ". Всего: " << m_coins << '\n';
-}
-
-std::string_view Hero::GetRole() const
-{
-    return "Герой";
-}
-
-void Hero::ShowInfo() const
-{
-    std::cout << "\n--- " << GetRole() << " ---\n"
-              << GetBaseInfo() << '\n'
-              << "Монеты: " << m_coins << '\n';
-    m_inventory.ShowInfo();
 }
 
 int Hero::GetCoins() const
@@ -107,4 +89,26 @@ int Hero::GetCoins() const
 Inventory& Hero::GetInventory()
 {
     return m_inventory;
+}
+
+std::string_view Hero::GetRole() const
+{
+    return "Герой";
+}
+
+// Дополняет реализацию базового класса.
+std::string Hero::Describe() const
+{
+    return BaseCharacter::Describe() + ", монеты: " + std::to_string(m_coins);
+}
+
+std::unique_ptr<BaseCharacter> Hero::Clone() const
+{
+    return std::make_unique<Hero>(*this);
+}
+
+void Hero::ShowInfo() const
+{
+    std::cout << Describe() << '\n';
+    m_inventory.ShowInfo();
 }

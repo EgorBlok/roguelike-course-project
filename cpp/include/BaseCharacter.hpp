@@ -1,25 +1,40 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <string_view>
 
-// Общие свойства любого участника боя.
 class BaseCharacter
 {
 private:
+    struct HealthState
+    {
+        int maxHealth{};
+        int health{};
+    };
+
+    inline static int s_createdCount{ 0 };
+
+    int m_id{};
     std::string m_name{};
-    int m_maxHealth{};
-    int m_health{};
+    std::shared_ptr<HealthState> m_healthState{};
     int m_attack{};
 
+    static int NextId();
+
 protected:
-    // Доступен Hero и Enemy, но не вызывающему коду.
-    std::string GetBaseInfo() const;
     void RestoreHealth(int amount);
+    void ShareHealthWith(const BaseCharacter& other);
+    std::string GetBaseInfo() const;
 
 public:
     BaseCharacter(std::string_view name, int maxHealth, int attack);
+    BaseCharacter(const BaseCharacter& other);
+    BaseCharacter(BaseCharacter&& other) noexcept;
     virtual ~BaseCharacter();
+
+    BaseCharacter& operator=(const BaseCharacter& other);
+    BaseCharacter& operator=(BaseCharacter&& other) noexcept;
 
     void TakeDamage(int damage);
     bool IsAlive() const;
@@ -28,8 +43,12 @@ public:
     int GetHealth() const;
     int GetMaxHealth() const;
     int GetAttack() const;
+    int GetId() const;
 
-    // У каждого наследника собственная роль и своё описание.
+    static int GetCreatedCount();
+
     virtual std::string_view GetRole() const = 0;
+    virtual std::string Describe() const;
+    virtual std::unique_ptr<BaseCharacter> Clone() const = 0;
     virtual void ShowInfo() const = 0;
 };

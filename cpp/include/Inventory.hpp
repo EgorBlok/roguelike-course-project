@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <array>
@@ -16,6 +15,10 @@ private:
 
 public:
     explicit Inventory(int initialItemsCount = 0);
+    Inventory(const Inventory&) = default;
+    Inventory& operator=(const Inventory&) = default;
+    Inventory(Inventory&&) noexcept = default;
+    Inventory& operator=(Inventory&&) noexcept = default;
     ~Inventory();
 
     bool AddItem(std::string_view itemName);
