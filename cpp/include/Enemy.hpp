@@ -1,28 +1,27 @@
-
 #pragma once
 
-#include <string>
+#include "BaseCharacter.hpp"
+
+#include <memory>
 #include <string_view>
 
-class Enemy
+class Enemy : public BaseCharacter
 {
-private:
-    std::string m_name{};
-    int m_maxHealth{};
-    int m_health{};
-    int m_attack{};
-
 public:
+    Enemy();
     Enemy(std::string_view name, int maxHealth, int attack);
-    ~Enemy();
+    Enemy(const Enemy& other);
+    Enemy(Enemy&& other) noexcept;
+    ~Enemy() override;
 
-    void TakeDamage(int damage);
+    Enemy& operator=(const Enemy& other);
+    Enemy& operator=(Enemy&& other) noexcept;
+
     int Attack() const;
-    bool IsAlive() const;
+    Enemy ShallowCopy() const;
 
-    void ShowInfo() const;
-
-    std::string_view GetName() const;
-    int GetHealth() const;
-    int GetMaxHealth() const;
+    std::string_view GetRole() const override;
+    std::string Describe() const override;
+    std::unique_ptr<BaseCharacter> Clone() const override;
+    void ShowInfo() const override;
 };

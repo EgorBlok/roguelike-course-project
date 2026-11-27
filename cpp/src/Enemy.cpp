@@ -1,97 +1,97 @@
-
 #include "Enemy.hpp"
 
-#include <algorithm>
 #include <iostream>
+#include <utility>
+
+Enemy::Enemy()
+    : Enemy{ "Безымянный противник", 30, 5 }
+{
+    std::cout << "[Enemy] Конструктор по умолчанию\n";
+}
 
 Enemy::Enemy(std::string_view name, int maxHealth, int attack)
-    : m_name{ name }
-    , m_maxHealth{ std::max(1, maxHealth) }
-    , m_health{ m_maxHealth }
-    , m_attack{ std::max(1, attack) }
+    : BaseCharacter{ name, maxHealth, attack }
 {
-    if (m_name.empty())
-    {
-        m_name = "Неизвестный противник";
-    }
+    std::cout << "[Enemy] Конструктор с параметрами: " << GetName() << '\n';
+}
 
-    std::cout << "[Enemy] Создан противник: " << m_name << '\n';
+Enemy::Enemy(const Enemy& other)
+    : BaseCharacter{ other }
+{
+    std::cout << "[Enemy] Конструктор копирования: " << GetName() << '\n';
+}
+
+Enemy::Enemy(Enemy&& other) noexcept
+    : BaseCharacter{ std::move(other) }
+{
+    std::cout << "[Enemy] Конструктор перемещения: " << GetName() << '\n';
 }
 
 Enemy::~Enemy()
 {
-    std::cout << "[Enemy] Уничтожен противник: " << m_name << '\n';
+    std::cout << "[Enemy] Деструктор: " << GetName() << '\n';
 }
 
-void Enemy::TakeDamage(int damage)
+Enemy& Enemy::operator=(const Enemy& other)
 {
-    if (!IsAlive())
+    if (this == &other)
     {
-        std::cout << m_name << " уже побеждён\n";
-        return;
+        return *this;
     }
 
-    if (damage <= 0)
+    BaseCharacter::operator=(other);
+    return *this;
+}
+
+Enemy& Enemy::operator=(Enemy&& other) noexcept
+{
+    if (this == &other)
     {
-        std::cout << "Некорректный урон\n";
-        return;
+        return *this;
     }
 
-    m_health = std::max(0, m_health - damage);
-
-    std::cout << m_name << " получает " << damage
-              << " урона. Здоровье: "
-              << m_health << "/" << m_maxHealth << '\n';
-
-    if (!IsAlive())
-    {
-        std::cout << m_name << " побеждён!\n";
-    }
+    BaseCharacter::operator=(std::move(other));
+    return *this;
 }
 
 int Enemy::Attack() const
 {
     if (!IsAlive())
     {
-        std::cout << m_name << " не может атаковать\n";
+        std::cout << GetName() << " не может атаковать\n";
         return 0;
     }
 
-    std::cout << m_name << " атакует! Урон: "
-              << m_attack << '\n';
-
-    return m_attack;
+    std::cout << GetName() << " атакует. Урон: " << GetAttack() << '\n';
+    return GetAttack();
 }
 
-bool Enemy::IsAlive() const
+// Демонстрация поверхностной копии: здоровье становится общим.
+Enemy Enemy::ShallowCopy() const
 {
-    return m_health > 0;
+    Enemy copy{ *this };
+    copy.ShareHealthWith(*this);
+    return copy;
+}
+
+std::string_view Enemy::GetRole() const
+{
+    return "Противник";
+}
+
+std::string Enemy::Describe() const
+{
+    return "Враг " + std::string{ GetName() } + ", HP: "
+        + std::to_string(GetHealth()) + "/" + std::to_string(GetMaxHealth())
+        + ", атака: " + std::to_string(GetAttack());
+}
+
+std::unique_ptr<BaseCharacter> Enemy::Clone() const
+{
+    return std::make_unique<Enemy>(*this);
 }
 
 void Enemy::ShowInfo() const
 {
-    std::cout << "\n--- Противник ---\n";
-    std::cout << "Имя: " << m_name << '\n';
-    std::cout << "Здоровье: " << m_health
-              << "/" << m_maxHealth << '\n';
-    std::cout << "Атака: " << m_attack << '\n';
-
-    std::cout << "Состояние: "
-              << (IsAlive() ? "жив" : "побеждён")
-              << '\n';
-}
-
-std::string_view Enemy::GetName() const
-{
-    return m_name;
-}
-
-int Enemy::GetHealth() const
-{
-    return m_health;
-}
-
-int Enemy::GetMaxHealth() const
-{
-    return m_maxHealth;
+    std::cout << Describe() << '\n';
 }
