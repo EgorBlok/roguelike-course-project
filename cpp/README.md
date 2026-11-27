@@ -47,3 +47,20 @@ cl /std:c++17 /EHsc /utf-8 /I include src\main.cpp src\Hero.cpp src\Enemy.cpp sr
 g++ -std=c++17 -Wall -Wextra -Iinclude src/main.cpp src/Hero.cpp src/Enemy.cpp src/Inventory.cpp -o dungeon.exe
 .\dungeon.exe
 ```
+
+## ЛР №4, этап 1: наследование (пункты 1–4)
+
+- `BaseCharacter` — абстрактный класс с общими полями имени, здоровья и атаки.
+- `Hero` и `Enemy` наследуются от него и реализуют `GetRole()` и `ShowInfo()`.
+- `GetBaseInfo()` и `RestoreHealth()` имеют уровень доступа `protected`.
+- Инвентарь остаётся композицией героя, связь с противником — агрегацией через `weak_ptr`.
+- В `main.cpp` добавлена демонстрация вызовов через `std::unique_ptr<BaseCharacter>`.
+
+Сборка из каталога `cpp`:
+
+```powershell
+g++ -std=c++17 -Wall -Wextra -Iinclude src/main.cpp src/BaseCharacter.cpp src/Hero.cpp src/Enemy.cpp src/Inventory.cpp -o dungeon.exe
+.\dungeon.exe
+```
+
+Следующий этап ЛР4: различные конструкторы, копирование и клонирование, `final`, `this`, `static`.

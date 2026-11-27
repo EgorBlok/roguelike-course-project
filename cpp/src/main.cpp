@@ -1,3 +1,4 @@
+#include "BaseCharacter.hpp"
 #include "Hero.hpp"
 
 #include <array>
@@ -16,7 +17,7 @@ int main()
     SetConsoleCP(CP_UTF8);
 #endif
 
-    std::cout << "=== Лабораторная работа №3: умные указатели ===\n";
+    std::cout << "=== Лабораторные работы №3-4: умные указатели и наследование ===\n";
 
     // 1. Композиция: Inventory - поле Hero по значению.
     // Агрегация: Hero хранит weak_ptr, владение Enemy остаётся у main.
@@ -161,6 +162,22 @@ int main()
             std::cout << "lock() вернул пустой shared_ptr\n";
         }
         observer.AttackEnemy(); // Безопасная обработка исчезнувшего объекта.
+    }
+
+    // ЛР 4: работа через указатели на общий абстрактный класс.
+    std::cout << "\n=== 9. Наследование: BaseCharacter ===\n";
+    {
+        std::array<std::unique_ptr<BaseCharacter>, 2> characters{};
+        characters[0] = std::make_unique<Hero>("Рыцарь", 100, 15);
+        characters[1] = std::make_unique<Enemy>("Орк-страж", 60, 12);
+
+        for (const auto& character : characters)
+        {
+            std::cout << "Роль: " << character->GetRole() << '\n';
+            character->ShowInfo();
+        }
+
+        std::cout << "Выход из блока с базовыми указателями\n";
     }
 
     std::cout << "\n=== Завершение программы ===\n";
