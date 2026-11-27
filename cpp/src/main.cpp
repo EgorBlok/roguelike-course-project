@@ -2,7 +2,6 @@
 #include "Enemy.hpp"
 #include "Hero.hpp"
 
-#include <array>
 #include <iostream>
 #include <memory>
 
@@ -20,9 +19,9 @@ int main()
     std::cout << "=== Лабораторная работа №4: наследование ===\n";
 
     // Пункты 1–3: абстрактный класс и два наследника.
-    // Пункт 12: работа с разными наследниками через базовый указатель.
+    // Пункт 12: массив указателей на базовый класс.
     {
-        std::array<std::unique_ptr<BaseCharacter>, 2> characters{
+        std::unique_ptr<BaseCharacter> characters[] = {
             std::make_unique<Hero>("Рыцарь", 100, 15),
             std::make_unique<Enemy>("Орк-страж", 60, 12)
         };
@@ -33,8 +32,8 @@ int main()
             character->ShowInfo();
         }
 
-        // Пункты 4–6: protected используется в ShowInfo(),
-        // здесь также видны конструкторы и виртуальные деструкторы.
+        // Пункты 4–6: protected в ShowInfo(), порядок конструкторов
+        // и безопасное уничтожение через виртуальный деструктор.
         std::cout << "\nОбъекты уничтожаются при выходе из блока.\n";
     }
 
