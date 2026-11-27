@@ -4,7 +4,9 @@ public class Inventory {
     private int itemsCount;
     private String talisman = "";
 
-    public Inventory() { this(0); }
+    public Inventory() {
+        this(0);
+    }
 
     public Inventory(int initialItemsCount) {
         if (initialItemsCount >= 0 && initialItemsCount <= MAX_ITEMS) {
@@ -14,6 +16,15 @@ public class Inventory {
             }
         }
         System.out.println("[Inventory] Инвентарь создан");
+    }
+
+    public Inventory(Inventory other) {
+        this.itemsCount = other.itemsCount;
+        this.talisman = other.talisman;
+        for (int i = 0; i < itemsCount; i++) {
+            this.items[i] = other.items[i];
+        }
+        System.out.println("[Inventory] Инвентарь скопирован");
     }
 
     public boolean addItem(String itemName) {
@@ -54,8 +65,13 @@ public class Inventory {
         return true;
     }
 
-    public int getItemsCount() { return itemsCount; }
-    public String getTalisman() { return talisman; }
+    public int getItemsCount() {
+        return itemsCount;
+    }
+
+    public String getTalisman() {
+        return talisman;
+    }
 
     public void showInfo() {
         System.out.println("\n--- Инвентарь ---");

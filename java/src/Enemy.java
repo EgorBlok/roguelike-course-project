@@ -1,55 +1,78 @@
-public class Enemy {
-    private final String name;
-    private final int maxHealth;
-    private int health;
-    private final int attack;
+import java.util.Objects;
 
-    public Enemy(String name, int maxHealth, int attack) {
-        this.name = name == null || name.isEmpty() ? "Неизвестный противник" : name;
-        this.maxHealth = Math.max(1, maxHealth);
-        this.health = this.maxHealth;
-        this.attack = Math.max(1, attack);
-        System.out.println("[Enemy] Создан противник: " + this.name);
+public class Enemy extends BaseCharacter {
+    public Enemy() {
+        this("Безымянный противник", 30, 5);
+        System.out.println("[Enemy] Конструктор по умолчанию");
     }
 
-    public void takeDamage(int damage) {
-        if (!isAlive()) {
-            System.out.println(name + " уже побеждён");
-            return;
-        }
-        if (damage <= 0) {
-            System.out.println("Некорректный урон");
-            return;
-        }
-        health = Math.max(0, health - damage);
-        System.out.println(name + " получает " + damage + " урона. Здоровье: " + health + "/" + maxHealth);
-        if (!isAlive()) {
-            System.out.println(name + " побеждён!");
-        }
+    public Enemy(String name, int maxHealth, int attack) {
+        super(name == null || name.isEmpty() ? "Неизвестный противник" : name,
+                maxHealth, attack);
+        System.out.println("[Enemy] Конструктор с параметрами");
+    }
+
+    // Глубокое копирование через конструктор базового класса.
+    public Enemy(Enemy other) {
+        super(other);
+        System.out.println("[Enemy] Конструктор копирования");
+    }
+
+    public Enemy shallowCopy() {
+        Enemy copy = new Enemy(this);
+        copy.shareHealthWith(this);
+        return copy;
     }
 
     public int attack() {
         if (!isAlive()) {
-            System.out.println(name + " не может атаковать");
+            System.out.println(getName() + " не может атаковать");
             return 0;
         }
-        System.out.println(name + " атакует! Урон: " + attack);
-        return attack;
-    }
-
-    public boolean isAlive() { return health > 0; }
-    public String getName() { return name; }
-    public int getHealth() { return health; }
-    public int getMaxHealth() { return maxHealth; }
-
-    public void showInfo() {
-        System.out.println("\n--- Противник ---");
-        System.out.println(toString());
+        System.out.println(getName() + " атакует. Урон: " + getAttack());
+        return getAttack();
     }
 
     @Override
-    public String toString() {
-        return "Имя: " + name + "\nЗдоровье: " + health + "/" + maxHealth
-                + "\nАтака: " + attack + "\nСостояние: " + (isAlive() ? "жив" : "побеждён");
+    public String getRole() {
+        return "Противник";
+    }
+
+    // В отличие от Hero, полностью заменяет метод базового класса.
+    @Override
+    public String describe() {
+        return "Враг " + getName() + ", HP: " + getHealth()
+                + "/" + getMaxHealth() + ", атака: " + getAttack();
+    }
+
+    @Override
+    public Enemy cloneCharacter() {
+        return new Enemy(this);
+    }
+
+    @Override
+    public void showInfo() {
+        System.out.println(describe());
+    }
+
+    // Равными считаем противников одного вида с одинаковыми исходными параметрами.
+    // Текущее HP в сравнение не входит: оно меняется во время боя.
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Enemy other = (Enemy) obj;
+        return getMaxHealth() == other.getMaxHealth()
+                && getAttack() == other.getAttack()
+                && getName().equals(other.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(), getMaxHealth(), getAttack());
     }
 }
